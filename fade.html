@@ -31,6 +31,11 @@
 									<header class="main">
 										<h1>A2 - Fade</h1>
 									</header>
+
+									<h2>Demo</h2>
+									<p>Here is a gif of my LEDs fading in action!</p>
+									<img src="images/fade.gif" alt="gif of fade">
+									<hr class="major">
 									<h2>Design Requirements</h2>
 									<p>
 										<ul>
@@ -52,13 +57,16 @@
 
 									<hr class="major" />
 
-									<h2>Schematic and Circuit</h2>
-									<p>Here is a schematic of my circuit (left) and my circuit board (right). I chose to use a blue, white, and red LED to recreate a police light bar. Each circuit has its own current and digital pin. The blue and white LEDs have a 100ohms resistor while the red has a 220ohms resistor. I chose these values after calculating the recommended resistance for a 20mA current through the different LEDS considering their voltage drop with a 5V voltage.</p>
-									<span class="image"><img width="600" src="images/IMG_2357.jpg" alt="My Schematic" /></span>
-									<span class="image"><img width="800" src="images/IMG_2357.jpg" alt="My Circuit" /></span>
+									<h2>Schematic and Calculations</h2>
+									<p>Here is a schematic of my circuit (left) and my calculations (right). I chose to fade the RGB LED. Each color from the LED has its own current and digital pin. The blue has a 100 ohm resistor, while the red and green have a 220 ohm resistor. I chose these values after calculating the recommended resistance for a 20mA current through the different LEDS considering their voltage drop with a 5V voltage. For the two regular red and green LEDS, I used a 220ohm resistor.</p>
+									<p>For the push button, I used a 10k ohm resistor as a pull-up resistor so the circuit runs properly with the button and does not connect directly connect ground to the input.</p>
+									<span class="image"><img width="600" src="images/a2-schematic.png" alt="My Schematic" /></span>
+									<span class="image"><img width="800" src="images/a2-calculations.png" alt="My Calculations" /></span>
 
 									<hr class="major" />
-
+									<h2>Circuit</h2>
+									<span class="image"><img width="800" src="images/IMG_23573.jpg" alt="My Circuit" /></span>
+									<hr class="major">
 									<h2>Code Snippet</h2>
 									<div class="image main">
 											<pre><code class="language-c++ language-arduino">
@@ -129,12 +137,6 @@ void loop() {
 	}
 }</code></pre>
 									</div>
-
-									<hr class="major" />
-
-									<h2>Demo</h2>
-									<p>Here is a gif of my circuit and LEDs fading in action!</p>
-									<img src="images/IMG_2308.gif" alt="gif of fade">
 								</section>
 
 						</div>

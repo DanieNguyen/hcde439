@@ -1,0 +1,201 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Input & Output - Daniel 439</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<link href="assets/css/prism.css" rel="stylesheet" />
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<div id="main">
+						<div class="inner">
+
+							<!-- Header -->
+							<header id="header">
+									<a href="index.html" class="logo"><strong>HCDE 439</strong> by Daniel Nguyen</a>
+								</header>
+
+							<!-- Content -->
+								<section>
+									<header class="main">
+										<h1>A3 - Input & Output</h1>
+									</header>
+
+									<h2>Demo</h2>
+									<p>Here is a gif of my LEDs fading when I'm interacting with the photocell resistor!</p>
+									<img src="images/inputoutput.gif" alt="gif of inputoutput">
+									<hr class="major">
+									<h2>Design Requirements</h2>
+									<p>
+										<ul>
+											<li>You must use a sensor that changes its resistance givens some change in the physical world.
+											</li>
+											<li>Your schematic, code, and circuit must correspond to each other! If they don't match, we may deduct points for the part
+											that doesn't correspond to the others.</li>
+											<li>You explain what values you might read at the voltage divider. You should calculate an appropriate resistance to use.
+											Show your calculation.</li>
+											<li>Your Arduino code should use analogWrite(), analogRead() and an if-statement.
+											Within your code, for each line of code with content (i.e. not lines of code which are only white space, a curly brace,
+											etc), add a short comment (// like this) above the line of code explaining what the line does.</li>
+										</ul>
+									</p>
+
+									<hr class="major" />
+
+									<h2>Schematic and Calculations</h2>
+									<p>Here is a schematic of my circuit (left) and my calculations (right). I chose to fade the RGB LED. Each color from the LED has its own current and digital pin. The blue has a 100 ohm resistor, while the red and green have a 220 ohm resistor. I chose these values after calculating the recommended resistance for a 20mA current through the different LEDS considering their voltage drop with a 5V voltage. For the two regular red and green LEDS, I used a 220ohm resistor.</p>
+									<p>For the push button, I used a 10k ohm resistor as a pull-up resistor so the circuit runs properly with the button and does not connect directly connect ground to the input.</p>
+									<span class="image"><img width="600" src="images/a3-schematic.png" alt="My Schematic" /></span>
+									<span class="image"><img width="600" src="images/a3-calculation1.png" alt="My Calculations" /></span>
+									<span class="image"><img width="600" src="images/a3-calculation2.png" alt="My Calculations" /></span>
+									<hr class="major" />
+									<h2>Circuit</h2>
+									<span class="image"><img width="800" src="images/IMG_2399.jpg" alt="My Circuit" /></span>
+									<hr class="major">
+									<h2>Code Snippet</h2>
+									<div class="image main">
+											<pre><code class="language-c++ language-arduino">
+/*
+Analog input, analog output, serial output
+
+Reads an analog input pin, maps the result to a range from 0 to 255 and uses
+the result to set the pulse width modulation (PWM) of an output pin.
+Also prints the results to the Serial Monitor.
+
+The circuit:
+- potentiometer connected to analog pin 0.
+Center pin of the potentiometer goes to the analog pin.
+side pins of the potentiometer go to +5V and ground
+- LED connected from digital pin 9 to ground
+
+created 29 Dec. 2008
+modified 9 Apr 2012
+by Tom Igoe
+
+This example code is in the public domain.
+
+http://www.arduino.cc/en/Tutorial/AnalogInOutSerial
+*/
+
+// These constants won't change. They're used to give names to the pins used:
+const int analogInPin = A0; // Analog input pin that the potentiometer is attached to
+const int analogOutPin = 11; // Analog output pin that the LED is attached to
+const int analogOutPin2 = 9; // Analog output pin that the LED is attached to
+
+
+int val = 0; // value read from the pot
+int outputValue = 0; // value output to the PWM (analog out)
+int outputValue2 = 0; // value output to the PWM (analog out)
+int count = 0;
+
+
+void setup() {
+	// initialize serial communications at 9600 bps:
+	Serial.begin(9600);
+}
+
+void loop() {
+	// read the analog in value:
+	val = analogRead(analogInPin);
+	int sensorValue = constrain(val, 700, 850);
+	// map it to the range of the analog out:
+	outputValue = map(sensorValue, 700, 850, 0, 255);
+	outputValue2 = map(sensorValue, 700, 850, 255, 0);
+	// change the analog out value:
+	if (count < 10) {
+		analogWrite(analogOutPin, outputValue);
+		analogWrite(analogOutPin2, outputValue2);
+		count++;
+	} else if (count < 20) {
+		analogWrite(analogOutPin, outputValue2);
+		analogWrite(analogOutPin2, outputValue);
+		count++;
+	} else {
+		count = 0;
+	}
+
+	// print the results to the Serial Monitor:
+	Serial.print("sensor = ");
+	Serial.print(sensorValue);
+	Serial.print("\t output = ");
+	Serial.print(outputValue);
+	Serial.print("\t output 2 = ");
+	Serial.println(outputValue2);
+	
+	// wait 2 milliseconds before the next loop for the analog-to-digital
+	// converter to settle after the last reading:
+	delay(2);
+}</code></pre>
+									</div>
+								</section>
+
+						</div>
+					</div>
+
+					<div id="sidebar">
+							<div class="inner">
+	
+								<!-- Search -->
+									<section id="search" class="alt">
+										<form method="post" action="#">
+											<input type="text" name="query" id="query" placeholder="Search" />
+										</form>
+									</section>
+	
+								<!-- Menu -->
+									<nav id="menu">
+										<header class="major">
+											<h2>Menu</h2>
+										</header>
+										<ul>
+											<li><a href="index.html">Home</a></li>
+											<li><a href="blink.html">A1 - Blink</a></li>
+											<li><a href="fade.html">A2 - Fade</a></li>
+											<li><a href="input.html">A3 - Input & Output</a></li>
+										</ul>
+									</nav>
+	
+								<!-- Section -->
+									<section>
+										<header class="major">
+											<h2>Get in touch</h2>
+										</header>
+										<ul class="contact">
+											<li class="icon solid fa-envelope"><a href="mailto:danngu@uw.edu">danngu@uw.edu</a></li>
+											<li class="icon solid fa-phone">(425) 215 9646</li>
+											<li class="icon solid fa-wifi"><a href="danielnguy.com" target="_blank">danielnguy.com</a></li>
+										</ul>
+									</section>
+	
+								<!-- Footer -->
+									<footer id="footer">
+										<p class="copyright">&copy; 
+											Daniel Nguyen. All rights reserved. <br>Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+									</footer>
+	
+							</div>
+						</div>
+	
+				</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+			<script src="assets/js/prism.js"></script>
+
+	</body>
+</html>

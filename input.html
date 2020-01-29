@@ -33,8 +33,9 @@
 									</header>
 
 									<h2>Demo</h2>
-									<p>Here is a gif of my LEDs fading when I'm interacting with the photocell resistor!</p>
+									<p>Here are gifs of my LEDs fading when I'm interacting with the photocell resistor and of the Serial Monitor</p>
 									<img src="images/inputoutput.gif" alt="gif of inputoutput">
+									<img src="images/serial.gif" alt="gif of serial monitor">
 									<hr class="major">
 									<h2>Design Requirements</h2>
 									<p>
@@ -54,8 +55,8 @@
 									<hr class="major" />
 
 									<h2>Schematic and Calculations</h2>
-									<p>Here is a schematic of my circuit (left) and my calculations (right). I chose to fade the RGB LED. Each color from the LED has its own current and digital pin. The blue has a 100 ohm resistor, while the red and green have a 220 ohm resistor. I chose these values after calculating the recommended resistance for a 20mA current through the different LEDS considering their voltage drop with a 5V voltage. For the two regular red and green LEDS, I used a 220ohm resistor.</p>
-									<p>For the push button, I used a 10k ohm resistor as a pull-up resistor so the circuit runs properly with the button and does not connect directly connect ground to the input.</p>
+									<p>Here is a schematic of my circuit (left) and my calculations (right). I chose to fade the two green LEDs inversely when interacting with the photocell resistor. Both green LEDs have a 220 ohm resistor. I chose these values after calculating the recommended resistance for a 20mA current through the different LEDS considering their voltage drop with a 5V voltage. </p>
+									<p>For the voltage divider, I calculated the expected resistance of the photocell using the graph from the lecture slides. Since the photocell resistor is variable, I used a 10k ohm resistor to make sure I don't short circuit the arduino board. </p>
 									<span class="image"><img width="600" src="images/a3-schematic.PNG" alt="My Schematic" /></span>
 									<span class="image"><img width="600" src="images/a3-calculation1.PNG" alt="My Calculations" /></span>
 									<span class="image"><img width="600" src="images/a3-calculation2.PNG" alt="My Calculations" /></span>
@@ -67,37 +68,25 @@
 									<div class="image main">
 											<pre><code class="language-c++ language-arduino">
 /*
-Analog input, analog output, serial output
-
-Reads an analog input pin, maps the result to a range from 0 to 255 and uses
-the result to set the pulse width modulation (PWM) of an output pin.
-Also prints the results to the Serial Monitor.
+Adapted from AnalogInOutSerial example code in the Arduino editor.
 
 The circuit:
-- potentiometer connected to analog pin 0.
-Center pin of the potentiometer goes to the analog pin.
-side pins of the potentiometer go to +5V and ground
-- LED connected from digital pin 9 to ground
+- Voltage divider: two resistors - one 10k ohm resistor in series with a photocell resistor, connected to Analog Pin 0. 
+- Green LED connected from digital pin 9 to ground
+- Green LED connected from digital pin 11 to ground
 
-created 29 Dec. 2008
-modified 9 Apr 2012
-by Tom Igoe
-
-This example code is in the public domain.
-
-http://www.arduino.cc/en/Tutorial/AnalogInOutSerial
 */
 
-// These constants won't change. They're used to give names to the pins used:
-const int analogInPin = A0; // Analog input pin that the potentiometer is attached to
-const int analogOutPin = 11; // Analog output pin that the LED is attached to
-const int analogOutPin2 = 9; // Analog output pin that the LED is attached to
+// Unchanging variables
+const int analogInPin = A0; // Analog input pin that the voltage divider is attached to
+const int analogOutPin = 11; // Analog output pin that a Green LED is attached to
+const int analogOutPin2 = 9; // Analog output pin that a Green LED is attached to
 
 
-int val = 0; // value read from the pot
-int outputValue = 0; // value output to the PWM (analog out)
-int outputValue2 = 0; // value output to the PWM (analog out)
-int count = 0;
+int val = 0; // value read from analog input
+int outputValue = 0; // value output to the green LED 
+int outputValue2 = 0; // value output to the green LED
+int count = 0; // counter variable that will switch the LEDs
 
 
 void setup() {
@@ -108,16 +97,22 @@ void setup() {
 void loop() {
 	// read the analog in value:
 	val = analogRead(analogInPin);
-	int sensorValue = constrain(val, 700, 850);
-	// map it to the range of the analog out:
-	outputValue = map(sensorValue, 700, 850, 0, 255);
-	outputValue2 = map(sensorValue, 700, 850, 255, 0);
-	// change the analog out value:
-	if (count < 10) {
+
+	// constrain the sensorValues to the range I tested with the photocell resistor
+	int sensorValue = constrain(val, 480, 830);
+
+	// map a direct correlation to the range of the LED brightness
+	outputValue = map(sensorValue, 480, 830, 0, 255);
+
+	// map an inverse correlation to the range of the LED brightness
+	outputValue2 = map(sensorValue, 480, 830, 255, 0);
+
+	// If statement to swap the fading pattern of the green LEDs, changing every 10 seconds
+	if (count < 200) {
 		analogWrite(analogOutPin, outputValue);
 		analogWrite(analogOutPin2, outputValue2);
 		count++;
-	} else if (count < 20) {
+	} else if (count < 400) {
 		analogWrite(analogOutPin, outputValue2);
 		analogWrite(analogOutPin2, outputValue);
 		count++;
@@ -125,13 +120,15 @@ void loop() {
 		count = 0;
 	}
 
-	// print the results to the Serial Monitor:
+	// print the sensor value, both output values, and the counter to the Serial Monitor.
 	Serial.print("sensor = ");
 	Serial.print(sensorValue);
 	Serial.print("\t output = ");
 	Serial.print(outputValue);
 	Serial.print("\t output 2 = ");
-	Serial.println(outputValue2);
+	Serial.print(outputValue2);
+	Serial.print("\t count = ");
+	Serial.println(count);
 	
 	// wait 2 milliseconds before the next loop for the analog-to-digital
 	// converter to settle after the last reading:

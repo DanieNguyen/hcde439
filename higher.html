@@ -1,0 +1,189 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>High(er) voltage and Transistors - Daniel 439</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<link href="assets/css/prism.css" rel="stylesheet" />
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<div id="main">
+						<div class="inner">
+
+							<!-- Header -->
+							<header id="header">
+									<a href="index.html" class="logo"><strong>HCDE 439</strong> by Daniel Nguyen</a>
+								</header>
+
+							<!-- Content -->
+								<section>
+									<header class="main">
+										<h1>A4 - High(er) voltage and Transistors</h1>
+									</header>
+
+									<h2>Demo</h2>
+									<p>Here is a gif of my LED Strip increasing and decreasing in brightness when pressing the IR Remote.</p>
+									<img src="images/transistor.gif" alt="gif of a4">
+									<hr class="major">
+									<h2>Design Requirements</h2>
+									<p>
+										<ul>
+											<li>You must use a N-MOSFET transistor!
+											</li>
+											<li>You must use an external power supply!</li>
+											<li>You must use an input sensor that uses a library, e.g. the remote, capacitive sensing, or the humidity sensor.
+											</li>
+											<li>Your schematic, code, and circuit must correspond to each other! If they don't match, we may deduct points for the part that doesn't correspond to the others. If your schematic is wrong or your circuit does not match we will deduct up to one point.</li>
+											<li>All calculations must be explained, and at crucial spots in the circuit you must explain expected voltages and currents. If we cannot read your calculations (because they are handwritten) we will deduct points.</li>
+											<li>The transistor can handle a max current. Justify how much current you are using.</li>
+											<li>Your Arduino code should use at least analogWrite(). During pinMode() initializing, explain the state the pin is in.
+												Within your code, for each line of code with content (i.e. not lines of code which are only white space, a curly brace, etc), add a short comment (// like this) above the line of code explaining what the line does.</li>
+										</ul>
+									</p>
+
+									<hr class="major" />
+
+									<h2>Schematic and Calculations</h2>
+									<p>Here is a schematic of my circuit and my calculations.</p>
+									<span class="image"><img width="800" src="images/a4-schem.png" alt="My Schematic" /></span>
+									<span class="image"><img width="600" src="images/a4-calc1.png" alt="My Calculations" /></span>
+									<span class="image"><img width="600" src="images/a4-calc2.png" alt="My Calculations" /></span>
+									<br>
+									<p>The MOSFET transistor functions depending on the voltage, not current so I just chose to create a 0.5A safe current with the 10k ohm resistor and the arduino's 5V voltage. With the pinMode() initializing, the pin is set to HIGH because it is an output.</p>
+									<hr class="major" />
+									<h2>Circuit</h2>
+									<span class="image"><img width="800" src="images/IMG_2573.jpg" alt="My Circuit" /></span>
+									<hr class="major">
+									<h2>Code Snippet</h2>
+									<div class="image main">
+											<pre><code class="language-c++ language-arduino">
+/* Worked with Franklin Huynh on this assignment */
+
+#include <IRremote.h> //include IRremote library
+
+const int RECV_PIN = 7; // Set up the IR Receiver to pin 7
+IRrecv irrecv(RECV_PIN); // Create an instance of the IR Receiver
+decode_results results; // Create an instance of the results
+
+void setup(){
+	Serial.begin(9600); // Initialize serial at 9600 baud
+	irrecv.enableIRIn(); // Enables IR input to be detected with the receiver
+	irrecv.blink13(true); // Enable blinking the LED when it's receiving signals
+	pinMode(9, OUTPUT); // Initialize pin 9 as output
+	
+}
+
+void loop(){
+	if (irrecv.decode(&results)){ // Checks if there is an IR signal received
+		String code = String(results.value, HEX); // Converts and stores the resulting IR signal into a variable
+		Serial.println(code); // Prints the string on the serial monitor
+		/*  If the rewind button is pressed, the LED strip will turn on at max brightness, 
+		*  decreasing in 0.5 second intervals to a dim brightness.
+		*  If the fast forward button is pressed, the LED strip will turn on at a dim brightness 
+		*  and increase in 0.5 second intervals to max brightness.
+		*/
+		if (code == "ff22dd") { // If the rewind button is pressed
+		analogWrite(9, 255); // Turn the LED Strip to brightness of 255
+		delay(500); // 0.5 second delay
+		analogWrite(9, 205); // Turn the LED Strip to brightness of 205
+		delay(500); // 0.5 second delay
+		analogWrite(9, 155); // Turn the LED Strip to brightness of 155
+		delay(500); // 0.5 second delay
+		analogWrite(9, 105); // Turn the LED Strip to brightness of 105
+		delay(500); // 0.5 second delay
+		analogWrite(9, 55); // Turn the LED Strip to brightness of 55
+		delay(500); // 0.5 second delay
+		analogWrite(9, 15); // Turn the LED Strip to brightness of 15
+		delay(500); // 0.5 second delay
+		} else if (code == "ffc23d") { // If the fast forward button is pressed
+		analogWrite(9, 15); // Turn the LED Strip to brightness of 15
+		delay(500); // 0.5 second delay
+		analogWrite(9, 55); // Turn the LED Strip to brightness of 55
+		delay(500); // 0.5 second delay
+		analogWrite(9, 105); // Turn the LED Strip to brightness of 105
+		delay(500); // 0.5 second delay
+		analogWrite(9, 155); // Turn the LED Strip to brightness of 155
+		delay(500); // 0.5 second delay
+		analogWrite(9, 205); // Turn the LED Strip to brightness of 205
+		delay(500); // 0.5 second delay
+		analogWrite(9, 255); // Turn the LED Strip to brightness of 255
+		delay(500); // 0.5 second delay
+		}
+		irrecv.resume(); // Reset receive to resume IR detection
+	}
+}
+</code></pre>
+									</div>
+								</section>
+
+						</div>
+					</div>
+
+					<div id="sidebar">
+							<div class="inner">
+	
+								<!-- Search -->
+									<section id="search" class="alt">
+										<form method="post" action="#">
+											<input type="text" name="query" id="query" placeholder="Search" />
+										</form>
+									</section>
+	
+								<!-- Menu -->
+									<nav id="menu">
+										<header class="major">
+											<h2>Menu</h2>
+										</header>
+										<ul>
+											<li><a href="index.html">Home</a></li>
+											<li><a href="blink.html">A1 - Blink</a></li>
+											<li><a href="fade.html">A2 - Fade</a></li>
+											<li><a href="input.html">A3 - Input & Output</a></li>
+											<li><a href="higher.html">A4 - Higher Voltages and Transistors </a></li>
+										</ul>
+									</nav>
+	
+								<!-- Section -->
+									<section>
+										<header class="major">
+											<h2>Get in touch</h2>
+										</header>
+										<ul class="contact">
+											<li class="icon solid fa-envelope"><a href="mailto:danngu@uw.edu">danngu@uw.edu</a></li>
+											<li class="icon solid fa-phone">(425) 215 9646</li>
+											<li class="icon solid fa-wifi"><a href="danielnguy.com" target="_blank">danielnguy.com</a></li>
+										</ul>
+									</section>
+	
+								<!-- Footer -->
+									<footer id="footer">
+										<p class="copyright">&copy; 
+											Daniel Nguyen. All rights reserved. <br>Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+									</footer>
+	
+							</div>
+						</div>
+	
+				</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+			<script src="assets/js/prism.js"></script>
+
+	</body>
+</html>

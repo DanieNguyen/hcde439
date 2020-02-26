@@ -1,0 +1,151 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Talking to the web! - Daniel 439</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<link href="assets/css/prism.css" rel="stylesheet" />
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<div id="main">
+						<div class="inner">
+
+							<!-- Header -->
+							<header id="header">
+									<a href="index.html" class="logo"><strong>HCDE 439</strong> by Daniel Nguyen</a>
+								</header>
+
+							<!-- Content -->
+								<section>
+									<header class="main">
+										<h1>A5 - Talking to the web!</h1>
+									</header>
+
+									<h2>Demo</h2>
+									<p>Here is a gif of me moving the rocket ship on the browser with the joystick.</p>
+									<img src="images/a5.gif" alt="gif of a5">
+									<hr class="major">
+									<h2>Design Requirements</h2>
+									<p>
+										<ul>
+											<li>Your webpage must update based on input from your arduino!
+											</li>
+											<li>YYou must use two separate sensors</li>
+											<li>Your work must be your own! If you collaborate, you have to document that on your canvas submission.
+											</li>
+											<li>Your schematic, code, and circuit must correspond to each other! If they don't match, we may deduct points for the part that doesn't correspond to the others. If your schematic is wrong or your circuit does not match we will deduct up to one point.</li>
+											<li>All calculations must be explained, e.g. why are you getting those numbers from your analogRead()?</li>
+											<li>Within your code, for each line of code with content (i.e. not lines of code which are only white space, a curly brace, etc), add a short comment (// like this) above the line of code explaining what the line does.</li>
+										</ul>
+									</p>
+
+									<hr class="major" />
+
+									<h2>Schematic</h2>
+									<p>Here is a schematic of my circuit. It was a fairly simple circuit since it only needed the joystick to function. </p>
+									<span class="image"><img width="800" src="images/a5-schem.jpg" alt="My Schematic" /></span>
+									<hr class="major" />
+									<h2>Circuit</h2>
+									<span class="image"><img width="800" src="images/IMG_2594.jpg" alt="My Circuit" /></span>
+									<hr class="major">
+									<h2>Code Snippet - Arduino</h2>
+									<div class="image main">
+											<pre><code class="language-c++ language-arduino">
+/* Code adapted from Lecture Slides */
+
+int x = A0; // Set Analog Pin 0 as a variable storing the X input from joystick
+int y = A1; // Set Analog Pin 1 as a variable storing the Y input from joystick
+int xval = 0; // Create variable to hold the X coordinates
+int yval = 0; // Create variable to hold the Y coordinates
+
+void setup() {
+	Serial.begin(9600); // Begin Serial Monitoring
+}
+
+void loop() {
+	xval = analogRead(x); // Read X coordinate pin and store into variable
+	yval = analogRead(y); // Read Y coordinate pin and store into variable
+	Serial.print("[");    // Format array
+	Serial.print(xval);   // Print X coordinate into serial monitor array
+	Serial.print(",");
+	Serial.print(yval);   // Print Y coordinate into serial monitor array
+	Serial.println("]");
+}
+</code></pre>
+									</div>
+									<h2>Code Snippet - JS</h2>
+									<span class="image"><img src="images/js.png" alt="My JS" /></span>
+								</section>
+
+						</div>
+					</div>
+
+					<div id="sidebar">
+							<div class="inner">
+	
+								<!-- Search -->
+									<section id="search" class="alt">
+										<form method="post" action="#">
+											<input type="text" name="query" id="query" placeholder="Search" />
+										</form>
+									</section>
+	
+								<!-- Menu -->
+									<nav id="menu">
+										<header class="major">
+											<h2>Menu</h2>
+										</header>
+										<ul>
+											<li><a href="index.html">Home</a></li>
+											<li><a href="blink.html">A1 - Blink</a></li>
+											<li><a href="fade.html">A2 - Fade</a></li>
+											<li><a href="input.html">A3 - Input & Output</a></li>
+											<li><a href="higher.html">A4 - Higher Voltages and Transistors </a></li>
+											<li><a href="rocket.html">A5 - Talking to the web! </a></li>
+										</ul>
+									</nav>
+	
+								<!-- Section -->
+									<section>
+										<header class="major">
+											<h2>Get in touch</h2>
+										</header>
+										<ul class="contact">
+											<li class="icon solid fa-envelope"><a href="mailto:danngu@uw.edu">danngu@uw.edu</a></li>
+											<li class="icon solid fa-phone">(425) 215 9646</li>
+											<li class="icon solid fa-wifi"><a href="danielnguy.com" target="_blank">danielnguy.com</a></li>
+										</ul>
+									</section>
+	
+								<!-- Footer -->
+									<footer id="footer">
+										<p class="copyright">&copy; 
+											Daniel Nguyen. All rights reserved. <br>Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+									</footer>
+	
+							</div>
+						</div>
+	
+				</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+			<script src="assets/js/prism.js"></script>
+
+	</body>
+</html>

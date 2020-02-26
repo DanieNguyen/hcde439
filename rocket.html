@@ -57,6 +57,7 @@
 									<span class="image"><img width="800" src="images/a5-schem.jpg" alt="My Schematic" /></span>
 									<hr class="major" />
 									<h2>Circuit</h2>
+									<p>Here is a picture of my circuit.</p>
 									<span class="image"><img width="800" src="images/IMG_2594.jpg" alt="My Circuit" /></span>
 									<hr class="major">
 									<h2>Code Snippet - Arduino</h2>
@@ -85,7 +86,85 @@ void loop() {
 </code></pre>
 									</div>
 									<h2>Code Snippet - JS</h2>
-									<span class="image"><img src="images/js.png" alt="My JS" /></span>
+									<div class="image main">
+										<pre><code class="language-javascript">
+var serial; // variable to hold an instance of the serialport library
+var portName = 'COM5' //rename to the name of your port
+var dataarray = []; //some data coming in over serial!
+var rocket; // Variable to store rocket image
+var star; //Variable to store star image
+
+
+function setup() {
+	serial = new p5.SerialPort();       // make a new instance of the serialport library
+	serial.on('list', printList);       // set a callback function for the serialport list event
+	serial.on('connected', serverConnected); // callback for connecting to the server
+	serial.on('open', portOpen);        // callback for the port opening
+	serial.on('data', serialEvent);     // callback for when new data arrives
+	serial.on('error', serialError);    // callback for errors
+	serial.on('close', portClose);      // callback for the port closing
+	
+	serial.list();                      // list the serial ports
+	serial.open(portName);              // open a serial port
+
+	createCanvas(1200, 600);
+	rocket = loadImage('../addons/rocket.PNG'); // Load rocket image
+	star = loadImage('../addons/star.PNG'); // Load star image
+}
+	
+// get the list of ports:
+function printList(portList) {
+	// portList is an array of serial port names
+	for (var i = 0; i < portList.length; i++) {
+	// Display the list the console:
+	print(i + " " + portList[i]);
+	}
+}
+
+function serverConnected() {
+	print('connected to server.');
+}
+	
+function portOpen() {
+	print('the serial port opened.')
+}
+	
+function serialError(err) {
+	print('Something went wrong with the serial port. ' + err);
+}
+	
+function portClose() {
+	print('The serial port closed.');
+}
+
+function serialEvent() {
+	if (serial.available()) {
+	var datastring = serial.readLine(); // readin some serial
+	var newarray;
+	try {
+		newarray = JSON.parse(datastring); // can we parse the serial
+	} catch (err) {
+		//console.log(err);
+	}
+	if (typeof (newarray) == 'object') {
+		dataarray = newarray;
+	}
+	console.log("got back " + datastring);
+	}
+}
+
+
+function draw() {
+	background(0); // Draw black background
+	for (let i = 0; i < 4; i++) { // For loop to draw random stars
+	let x = random(1200); // Create random variable for x coordinate of stars
+	let y = random(600); //Create random variable for y coordinate of stars
+	image(star, x, y, star.width / 3, star.height / 3); // Draw a star with random x, y coordinates with a size of 33 pixels
+	}
+	image(rocket, dataarray[0], dataarray[1]); // Draw a rocket with x, y coordinates from Joystick input with a size of 100 pixels
+}						
+</code></pre>
+								</div>
 								</section>
 
 						</div>

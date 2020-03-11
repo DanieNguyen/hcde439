@@ -1,0 +1,622 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Final Project - Daniel 439</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<link href="assets/css/prism.css" rel="stylesheet" />
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<div id="main">
+						<div class="inner">
+
+							<!-- Header -->
+							<header id="header">
+									<a href="index.html" class="logo"><strong>HCDE 439</strong> by Daniel Nguyen</a>
+								</header>
+
+							<!-- Content -->
+								<section>
+									<header class="main">
+										<h1>Final Project - 
+											Game Controller
+										</h1>
+									</header>
+
+									<h2>Demo</h2>
+									<p>Here is a video of my controller playing Space Invaders.</p>
+									<iframe width="600" height="400"
+									src="https://www.youtube.com/watch?v=GClilYIQNkY&feature=emb_logo">
+									</iframe>
+									<hr class="major">
+									<h2>Design Requirements</h2>
+									<p>In the final projects, we want to see you integrate different skills you learn throughout the class. Your project needs to take some input and connect that to some output through digital logic. Your projects needs to be integrated into a prototype (so it cannot just be a breadboard on the table!)
+									</p>
+
+									<hr class="major" />
+									<h2>Concept</h2>
+									<p>In the final project, I wanted to use what we learned with P5.js and Arduino to make a small game controller and game. I planned to design a small game playable with my controller that contains a joystick and two push buttons.
+									</p>
+									<hr class="major" />
+
+									<h2>Schematic</h2>
+									<p>Here are schematics of my circuit, one basic schematic and one showing how I soldered the actual circuit. They were fairly simple circuits since the joystick had no resistor and the push button circuits are identical with both using a 10k ohm resistor. </p>
+									<span class="image"><img width="800" src="images/finalschematic.png" alt="My Basic Schematic" /></span>
+									<span class="image"><img width="800" src="images/finalschematic-soldered.png" alt="My Soldered Schematic" /></span>
+									<hr class="major" />
+									<h2>Circuit</h2>
+									<p>Here is a picture of my circuit and final prototype. I soldered the joystick and button wires together to save space and I enclosed the electronics in a cardboard box. All components - the joystick and both buttons - have soldered connections to 5V and ground. The blue button is connected to Digital Pin 2 while the yellow button is connected to Digital Pin 4. The joystick's X variable is connected to Analog Pin 0 and the Y to Analog Pin 4. The box helps keep everything together as well as ergonomics for playing the game.</p>
+									<span class="image"><img width="800" src="images/IMG_2664.jpg" alt="My Circuit" /></span>
+									<span class="image"><img width="800" src="images/IMG_2657.jpg" alt="My Circuit" /></span>
+									<hr class="major">
+									<h2>Code Snippet - Arduino</h2>
+									<div class="image main">
+											<pre><code class="language-c++ language-arduino">
+
+/* Code adapted from Lecture Slides */
+
+int x = A0; // Set Analog Pin 0 as a variable storing the X input from joystick
+int y = A4; // Set Analog Pin 1 as a variable storing the Y input from joystick
+int blue = 2; // Set Analog Pin 0 as a variable storing the X input from joystick
+int yellow = 4; // Set Analog Pin 1 as a variable storing the Y input from joystick
+int xval = 0; // Create variable to hold the X coordinates
+int yval = 0; // Create variable to hold the Y coordinates
+int bval = 0; // Create variable to hold the blue button
+int oval = 0; // Create variable to hold the yellow button
+
+void setup() {
+	Serial.begin(9600); // Begin Serial Monitoring
+	pinMode(2, INPUT);
+	pinMode(4, INPUT);
+}
+
+void loop() {
+	xval = analogRead(x); // Read X coordinate pin and store into variable
+	yval = analogRead(y); // Read Y coordinate pin and store into variable
+	bval = digitalRead(blue); // Read X coordinate pin and store into variable
+	oval = digitalRead(yellow); // Read Y coordinate pin and store into variable
+	Serial.print("[");    // Format array
+	Serial.print(xval);   // Print X coordinate into serial monitor array
+	Serial.print(",");
+	Serial.print(yval);   // Print Y coordinate into serial monitor array
+	Serial.print(",");
+	Serial.print(bval);   // Print Y coordinate into serial monitor array
+	Serial.print(",");
+	Serial.print(oval);   // Print Y coordinate into serial monitor array
+	Serial.println("]");
+}
+</code></pre>
+									</div>
+									<h2>Code Snippet - JS</h2>
+									<p>I adapted an existing P5 version of Space Invaders meant for keyboard play to extend to my controller. I also added the functionality of moving up and down not just laterally in the game.</p>
+									<div class="image main">
+										<pre><code class="language-javascript">
+/* Code adapted from Richard Middleton's Github to incorporate Arduino Controls and improved functionality of moving up and down into the Space Invaders game
+View his original game here https://www.richardmiddleton.me/projects/space-invaders/ 
+*/
+
+var serial; // variable to hold an instance of the serialport library
+var portName = 'COM3' //rename to the name of your port
+var dataarray = []; //some data coming in over serial!var ship;
+var aliens = [];
+var bullets = [];
+var score = 0;
+var start = true;
+var bg;
+var blinkingMenu = true;
+var dead = false;
+var gamestart = false;
+var highScore = 0;
+var playAgain = false;
+
+
+function preload() {
+	bg = loadImage('../img/start.png');
+	alienImg = loadImage('../img/alien.png');
+	shipImg = loadImage('../img/ship.png');
+}
+
+function setup() {
+	serial = new p5.SerialPort();       // make a new instance of the serialport library
+	serial.on('list', printList);       // set a callback function for the serialport list event
+	serial.on('connected', serverConnected); // callback for connecting to the server
+	serial.on('open', portOpen);        // callback for the port opening
+	serial.on('data', serialEvent);     // callback for when new data arrives
+	serial.on('error', serialError);    // callback for errors
+	serial.on('close', portClose);      // callback for the port closing
+	
+	serial.list();                      // list the serial ports
+	serial.open(portName);              // open a serial port
+
+	var cnv = createCanvas(800, 600);
+	var x = (windowWidth - width) / 2;
+	var y = (windowHeight - height) / 2;
+
+	cnv.position(x, y);
+	ship = new Ship();
+	alienArray();
+}
+
+// get the list of ports:
+function printList(portList) {
+	// portList is an array of serial port names
+	for (var i = 0; i < portList.length; i++) {
+	// Display the list the console:
+	print(i + " " + portList[i]);
+	}
+}
+
+function serverConnected() {
+	print('connected to server.');
+}
+	
+function portOpen() {
+	print('the serial port opened.')
+}
+	
+function serialError(err) {
+	print('Something went wrong with the serial port. ' + err);
+}
+	
+function portClose() {
+	print('The serial port closed.');
+}
+
+function serialEvent() {
+	if (serial.available()) {
+	var datastring = serial.readLine(); // readin some serial
+	var newarray;
+	try {
+		newarray = JSON.parse(datastring); // can we parse the serial
+	} catch (err) {
+		//console.log(err);
+	}
+	if (typeof (newarray) == 'object') {
+		dataarray = newarray;
+	}
+	console.log("got back " + datastring);
+	}
+}
+
+
+function draw() {
+	background(0);
+	fill(0);
+	rectMode(CENTER);
+	rect(width / 2, height / 2, 800, 600);
+
+	startScreen();
+	buttonPressed();
+	buttonReleased();
+	if (!start && !dead) {
+		startUp();
+	}
+	else if (dead) {
+		runDead();
+	}
+}
+
+
+// Create array of aliens with dimensions
+function alienArray() {
+	var count = 0;
+	for (var i = 0; i < 3; i++) {
+		for (var j = 0; j < 7; j++) {
+			aliens[count] = new Alien(j * 60 + 40, 20 - i * 60);
+			count++;
+		}
+	}
+}
+
+
+//================
+// Function World
+//================
+
+function startScreen() {
+	if (start) {
+		image(bg, 0, 0, width, height);
+		fill(255, 255, 255);
+		textSize(15);
+		textAlign(CENTER, BASELINE);
+		textStyle(BOLD);
+
+		if (frameCount % 30 == 0) {
+			if (blinkingMenu) {
+				blinkingMenu = false;
+			} else {
+				blinkingMenu = true;
+			}
+		}
+
+		if (blinkingMenu) {
+			text('PRESS THE BLUE BUTTON TO PLAY', width / 2, 500);
+		}
+		startGame();
+	}
+}
+
+function startUp() {
+	bulletFunc();
+	ship.move();
+	ship.show();
+	alienFunc();
+	scoreFunc();
+	endScreen();
+}
+
+function runDead() {
+	alienFunc();
+	scoreFunc();
+	endScreen();
+}
+
+
+function bulletFunc() {
+	for (var i = 0; i < bullets.length; i++) {
+		bullets[i].show();
+		bullets[i].move();
+
+		// Hit?
+		for (var j = 0; j < aliens.length; j++) {
+			if (bullets[i].hits(aliens[j])) {
+				aliens[j].kill();
+				bullets[i].kill();
+			}
+		}
+
+		if (bullets[i].toDelete) {
+			bullets.splice(i, 1);
+		}
+	}
+}
+
+
+function alienFunc() {
+	var edge = false;
+	for (var i = 0; i < aliens.length; i++) {
+		// Hit?
+		if (aliens[i].hits(ship)) {
+			dead = true;
+		}
+
+		aliens[i].move();
+		aliens[i].show();
+
+		// Detect edge
+		if (aliens[i].x > width - 15 || aliens[i].x < 15) {
+			edge = true;
+		}
+
+		// remove alien
+		if (aliens[i].toDelete) {
+			aliens.splice(i, 1);
+		}
+	}
+
+	// Shift Down
+	if (edge) {
+		for (var i = 0; i < aliens.length; i++) {
+			aliens[i].shiftDown();
+		}
+	}
+}
+
+
+function scoreFunc() {
+	strokeWeight(6);
+	stroke(50);
+	fill(255);
+	textSize(20);
+	text(score, 20, 30);
+	text(highScore, width -20, 30);
+	noStroke();
+}
+
+
+function endScreen() {
+	textSize(90);
+	fill(255);
+	textAlign(CENTER, CENTER);
+	if (!aliens.length) {
+		playAgain = true;
+		text('YOU WIN!', width / 2, height / 3);textSize(30);
+		textStyle(NORMAL);
+		text('Press the Blue Button To Restart', width / 2, height / 1.7);
+}
+	else if (dead) {
+		playAgain = true;
+		text('YOU LOSE!', width / 2, height / 3);
+		textSize(30);
+		textStyle(NORMAL);
+		text('Press the Blue Button To Restart', width / 2, height / 1.7);
+	}
+	
+}
+
+function reset() {
+	aliens = [];
+	bullets = [];
+	score = 0;
+	dead = false;
+	start = true;
+	blinkingMenu = true;
+	alienArray();
+	gamestart = false;
+}
+
+function Bullet() {
+    this.x = ship.x;
+    this.y = ship.y + 160;
+    this.r = 3;
+    this.toDelete = false;
+
+    this.show = function () {
+        rectMode(CENTER);
+        fill(255);
+        rect(this.x, this.y, this.r * 2, this.r * 2);
+    }
+
+    this.hits = function (alien) {
+        var d = dist(this.x, this.y, alien.x, alien.y);
+        if (d < this.r + alien.r) {
+            score += 1;
+            if (score > highScore) {
+                highScore = score;
+            }
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    this.kill = function () {
+        this.toDelete = true;
+    }
+
+    this.move = function () {
+        this.y = this.y - 2;
+    }
+}
+
+var alienImg;
+
+function Alien(x, y) {
+    this.x = x;
+    this.y = y;
+    this.r = 20;
+    this.toDelete = false;
+    this.xdir = 1;
+
+    this.kill = function () {
+        this.toDelete = true;
+    }
+
+    this.shiftDown = function () {
+        this.xdir *= -1.1;
+        this.y += this.r;
+    }
+
+    this.move = function () {
+        this.x = this.x + this.xdir;
+    }
+
+    this.hits = function (ship) {
+        var d = dist(this.x, this.y, ship.x, ship.y + 160);
+        if (d < this.r + ship.r) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+
+    this.show = function () {
+        image(alienImg, this.x - 20, this.y, this.r * 2, this.r * 2);
+    }
+}
+
+var shipImg;
+
+function Ship() {
+    this.x = width / 2;
+    this.y = height / 2;
+    this.r = 15;
+    this.direction = {
+        left: false,
+        right: false,
+        up: false,
+        down: false,
+    };
+
+
+    this.show = function () {
+        image(shipImg, this.x - 15, this.y + 160, 30, 30);
+    }
+
+    this.move = function () {
+        if (this.direction.left && this.x > 0) {
+            this.x -= 5;
+        } else if (this.direction.right && this.x < width) {
+            this.x += 5;
+        } else {
+            this.x = this.x;
+        }
+        if (this.direction.up && this.y > 0) {
+            this.y -= 5;
+        } else if (this.direction.down && this.y < height - 200) {
+            this.y += 5;
+        } else {
+            this.y = this.y;
+        }
+    }
+}
+
+
+//============
+// ARDUINO BUTTON AND KEY WORLD
+//============
+
+function buttonPressed() {
+	if (dataarray[1] < 524) {
+		ship.direction.right = true;
+	}
+	else if (dataarray[1] > 524) {
+		ship.direction.left = true;
+	}
+	else if (dataarray[0] > 509) {
+		ship.direction.up = true;
+	}
+	else if (dataarray[0] < 509) {
+		ship.direction.down = true;
+	}
+	else if (dataarray[3] === 1 && !start) { 
+		var bullet = new Bullet();
+		bullets.push(bullet);
+	} else if (dataarray[2] === 1 && start) {
+		gamestart = true;
+	}
+	if (playAgain && dataarray[2] === 1) {
+		reset();
+		playAgain = false;
+	}
+}
+
+function buttonReleased() {
+	if (dataarray[1] > 524) {
+		ship.direction.right = false;
+	}
+	else if (dataarray[1] < 524) {
+		ship.direction.left = false;
+	} else if (dataarray[1] === 524) {
+		ship.direction.left = false;
+		ship.direction.right = false;
+	}
+	if (dataarray[0] < 509) {
+		ship.direction.up = false;
+	}
+	else if (dataarray[0] > 509) {
+		ship.direction.down = false;
+	} else if (dataarray[0] === 509) {
+		ship.direction.up = false;
+		ship.direction.down = false;
+	}
+	
+}
+
+function keyPressed() {
+	if (keyCode === 39) {
+		ship.direction.right = true;
+	}
+	else if (keyCode === 37) {
+		ship.direction.left = true;
+	}
+	else if (keyCode == 32 && !start) {
+		var bullet = new Bullet();
+		bullets.push(bullet);
+	} else if (keyCode == 32 && start) {
+		gamestart = true;
+	}
+}
+
+function keyReleased() {
+	if (keyCode === 39) {
+		ship.direction.right = false;
+	}
+	else if (keyCode === 37) {
+		ship.direction.left = false;
+	}
+}
+
+function startGame() {
+	if (gamestart) {
+		start = false;
+		}
+}
+
+function mousePressed() {
+	if(playAgain){
+		reset();
+		playAgain = false;
+	}
+}
+</code></pre>
+								</div>
+								</section>
+
+						</div>
+					</div>
+
+					<div id="sidebar">
+							<div class="inner">
+	
+								<!-- Search -->
+									<section id="search" class="alt">
+										<form method="post" action="#">
+											<input type="text" name="query" id="query" placeholder="Search" />
+										</form>
+									</section>
+	
+								<!-- Menu -->
+									<nav id="menu">
+										<header class="major">
+											<h2>Menu</h2>
+										</header>
+										<ul>
+											<li><a href="index.html">Home</a></li>
+											<li><a href="blink.html">A1 - Blink</a></li>
+											<li><a href="fade.html">A2 - Fade</a></li>
+											<li><a href="input.html">A3 - Input & Output</a></li>
+											<li><a href="higher.html">A4 - Higher Voltages and Transistors </a></li>
+											<li><a href="rocket.html">A5 - Talking to the web! </a></li>
+											<li><a href="a6.html">A6 The web talks back! </a></li>
+											<li><a href="final.html">Final Prject - Game Controller </a></li>
+										</ul>
+									</nav>
+	
+								<!-- Section -->
+									<section>
+										<header class="major">
+											<h2>Get in touch</h2>
+										</header>
+										<ul class="contact">
+											<li class="icon solid fa-envelope"><a href="mailto:danngu@uw.edu">danngu@uw.edu</a></li>
+											<li class="icon solid fa-phone">(425) 215 9646</li>
+											<li class="icon solid fa-wifi"><a href="danielnguy.com" target="_blank">danielnguy.com</a></li>
+										</ul>
+									</section>
+	
+								<!-- Footer -->
+									<footer id="footer">
+										<p class="copyright">&copy; 
+											Daniel Nguyen. All rights reserved. <br>Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+									</footer>
+	
+							</div>
+						</div>
+	
+				</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+			<script src="assets/js/prism.js"></script>
+
+	</body>
+</html>

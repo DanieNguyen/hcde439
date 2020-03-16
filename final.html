@@ -109,20 +109,20 @@ View his original game here https://www.richardmiddleton.me/projects/space-invad
 */
 
 var serial; // variable to hold an instance of the serialport library
-var portName = 'COM3' //rename to the name of your port
-var dataarray = []; //some data coming in over serial!var ship;
-var aliens = [];
-var bullets = [];
-var score = 0;
-var start = true;
-var bg;
-var blinkingMenu = true;
-var dead = false;
-var gamestart = false;
-var highScore = 0;
-var playAgain = false;
+var portName = 'COM3' // rename to the name of your port
+var dataarray = []; // some data coming in over serial!var ship;
+var aliens = []; // variable to hold aliens
+var bullets = []; // variable to hold bullets
+var score = 0; // variable to hold score
+var start = true; // variable to show start
+var bg; // variable to hold bg image for start
+var blinkingMenu = true; // variable to show menu
+var dead = false; // variable to show dead state
+var gamestart = false; // variable to start game
+var highScore = 0; // variable to hold high score
+var playAgain = false; // variable to play again
 
-
+//preload images
 function preload() {
 	bg = loadImage('../img/start.png');
 	alienImg = loadImage('../img/alien.png');
@@ -223,9 +223,10 @@ function alienArray() {
 
 
 //================
-// Function World
+// Functions
 //================
 
+// function to display the starting screen and instructions
 function startScreen() {
 	if (start) {
 		image(bg, 0, 0, width, height);
@@ -249,6 +250,7 @@ function startScreen() {
 	}
 }
 
+// function to start the game
 function startUp() {
 	bulletFunc();
 	ship.move();
@@ -264,7 +266,7 @@ function runDead() {
 	endScreen();
 }
 
-
+// function that controls how bullets interact with aliens and the game
 function bulletFunc() {
 	for (var i = 0; i < bullets.length; i++) {
 		bullets[i].show();
@@ -284,7 +286,7 @@ function bulletFunc() {
 	}
 }
 
-
+// function that controls how aliens move and interact in the game
 function alienFunc() {
 	var edge = false;
 	for (var i = 0; i < aliens.length; i++) {
@@ -315,7 +317,7 @@ function alienFunc() {
 	}
 }
 
-
+// function to display the scores
 function scoreFunc() {
 	strokeWeight(6);
 	stroke(50);
@@ -326,7 +328,7 @@ function scoreFunc() {
 	noStroke();
 }
 
-
+// function for when the user beats the game or dies. Displays words and instructions to play again or continue playing.
 function endScreen() {
 	textSize(90);
 	fill(255);
@@ -347,6 +349,7 @@ function endScreen() {
 	
 }
 
+// function to reset the game
 function reset() {
 	aliens = [];
 	bullets = [];
@@ -358,6 +361,7 @@ function reset() {
 	gamestart = false;
 }
 
+// function to define the bullet and its movements
 function Bullet() {
     this.x = ship.x;
     this.y = ship.y + 160;
@@ -395,6 +399,7 @@ function Bullet() {
 
 var alienImg;
 
+// function to define the alien and its interactions
 function Alien(x, y) {
     this.x = x;
     this.y = y;
@@ -433,6 +438,7 @@ function Alien(x, y) {
 
 var shipImg;
 
+// function to define the spaceship and its interactions. It can move left, right, up, and down.
 function Ship() {
     this.x = width / 2;
     this.y = height / 2;
@@ -469,9 +475,10 @@ function Ship() {
 
 
 //============
-// ARDUINO BUTTON AND KEY WORLD
+// ARDUINO BUTTONS AND KEYS
 //============
 
+// Defines left, right, up, down, and buttons of the controller
 function buttonPressed() {
 	if (dataarray[1] < 524) {
 		ship.direction.right = true;
@@ -519,6 +526,7 @@ function buttonReleased() {
 	
 }
 
+// keyboard controls for the game, similar to the buttonPressed above
 function keyPressed() {
 	if (keyCode === 39) {
 		ship.direction.right = true;
